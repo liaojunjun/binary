@@ -1,0 +1,75 @@
+<h4 id="构造函数">构造函数</h4>
+<p><img src="https://zh.javascript.info/article/blob/blob.svg" alt="blob"></p>
+<pre><code class="language-js"><span class="hljs-keyword">new</span> Blob(blobParts, options);</code></pre>
+<ul>
+<li><p>blobParts 是 Blob/BufferSource/String 类型的值的数组</p>
+</li>
+<li><p>options { type:MIME 类型，endings 换行：transparent | native }</p>
+</li>
+</ul>
+<pre><code class="language-js"><span class="hljs-comment">// 从类型化数组（typed array）和字符串创建 Blob</span>
+<span class="hljs-keyword">let</span> hello = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>([<span class="hljs-number">72</span>, <span class="hljs-number">101</span>, <span class="hljs-number">108</span>, <span class="hljs-number">108</span>, <span class="hljs-number">111</span>]); <span class="hljs-comment">// 二进制格式的 &quot;hello&quot;</span>
+
+<span class="hljs-keyword">let</span> blob = <span class="hljs-keyword">new</span> Blob([hello, <span class="hljs-string">&quot; &quot;</span>, <span class="hljs-string">&quot;world&quot;</span>], { <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;text/plain&quot;</span> });</code></pre>
+<p>slice 方法来提取 Blob 片段</p>
+<pre><code class="language-js">blob.slice([byteStart], [byteEnd], [contentType]);</code></pre>
+<h4 id="blob-用作-url">Blob 用作 URL</h4>
+<pre><code class="language-js"><span class="hljs-keyword">let</span> link = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">&quot;a&quot;</span>);
+link.download = <span class="hljs-string">&quot;hello.txt&quot;</span>;
+
+<span class="hljs-keyword">let</span> blob = <span class="hljs-keyword">new</span> Blob([<span class="hljs-string">&quot;Hello, world!&quot;</span>], { <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;text/plain&quot;</span> });
+
+link.href = URL.createObjectURL(blob);
+
+link.click();
+
+URL.revokeObjectURL(link.href); <span class="hljs-comment">// 内部映射中移除引用,释放内存</span></code></pre>
+<blockquote>
+<p>浏览器内部为每个通过 URL.createObjectURL 生成的 URL 存储了一个 URL → Blob 映射。因此，此类 URL 很短，但可以访问 Blob</p>
+</blockquote>
+<h4 id="blob-转换为-base64">Blob 转换为 base64</h4>
+<pre><code class="language-js"><span class="hljs-keyword">let</span> link = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">&quot;a&quot;</span>);
+link.download = <span class="hljs-string">&quot;hello.txt&quot;</span>;
+
+<span class="hljs-keyword">let</span> blob = <span class="hljs-keyword">new</span> Blob([<span class="hljs-string">&quot;Hello, world!&quot;</span>], { <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;text/plain&quot;</span> });
+
+<span class="hljs-keyword">let</span> reader = <span class="hljs-keyword">new</span> FileReader();
+reader.readAsDataURL(blob); <span class="hljs-comment">// 将 Blob 转换为 base64 并调用 onload</span>
+
+reader.onload = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+  link.href = reader.result; <span class="hljs-comment">// data url</span>
+  link.click();
+};</code></pre>
+<table>
+<thead>
+<tr>
+<th>URL.createObjectURL(blob)</th>
+<th>Blob 转换为 data url</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>如果介意内存，我们需要撤销（revoke）它们直接访问 Blob，无需“编码/解码”</td>
+<td>无需撤销（revoke）任何操作。对大的 Blob 进行编码时，性能和内存会有损耗。</td>
+</tr>
+</tbody></table>
+<h4 id="image-转换为-blob">Image 转换为 blob</h4>
+<pre><code class="language-js">canvas.toBlob(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">blob</span>) </span>{
+  <span class="hljs-comment">// blob 创建完成，下载它</span>
+  <span class="hljs-keyword">let</span> link = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">&quot;a&quot;</span>);
+  link.download = <span class="hljs-string">&quot;example.png&quot;</span>;
+
+  link.href = URL.createObjectURL(blob);
+  link.click();
+
+  <span class="hljs-comment">// 删除内部 blob 引用，这样浏览器可以从内存中将其清除</span>
+  URL.revokeObjectURL(link.href);
+}, <span class="hljs-string">&quot;image/png&quot;</span>);</code></pre>
+<h4 id="blob-转换为-arraybuffer">Blob 转换为 ArrayBuffer</h4>
+<pre><code class="language-js"><span class="hljs-comment">// 从 blob 获取 arrayBuffer</span>
+<span class="hljs-keyword">let</span> fileReader = <span class="hljs-keyword">new</span> FileReader();
+
+fileReader.readAsArrayBuffer(blob);
+
+fileReader.onload = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">event</span>) </span>{
+  <span class="hljs-keyword">let</span> arrayBuffer = fileReader.result;
+};</code></pre>

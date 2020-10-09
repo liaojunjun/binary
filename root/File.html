@@ -1,0 +1,16 @@
+<p>File 对象继承自 Blob，并扩展了与文件系统相关的功能
+有两种方法获取它。</p>
+<h5 id="构造器">构造器</h5>
+<pre><code class="language-js"><span class="hljs-keyword">new</span> File(fileParts, fileName, [options]);</code></pre>
+<ul>
+<li>fileParts Blob/BufferSource/String 类型值的数组</li>
+<li>fileName 文件名字符串</li>
+<li>options {lastModified : 最后一次修改的时间戳}</li>
+</ul>
+<h5 id="inputtypefile获取">input[type=&#39;file&#39;]获取</h5>
+<pre><code class="language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">showFile</span>(<span class="hljs-params">input</span>) </span>{
+  <span class="hljs-keyword">let</span> file = input.files[<span class="hljs-number">0</span>];
+
+  alert(<span class="hljs-string">`File name: <span class="hljs-subst">${file.name}</span>`</span>); <span class="hljs-comment">// 例如 my.png</span>
+  alert(<span class="hljs-string">`Last modified: <span class="hljs-subst">${file.lastModified}</span>`</span>); <span class="hljs-comment">// 例如 1552830408824</span>
+}</code></pre>

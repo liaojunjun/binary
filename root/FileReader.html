@@ -1,0 +1,23 @@
+<p>FileReader 是一个对象，其唯一目的是从 Blob（因此也从 File）对象中读取数据</p>
+<pre><code class="language-js"><span class="hljs-keyword">let</span> reader = <span class="hljs-keyword">new</span> FileReader(); <span class="hljs-comment">// 没有参数</span></code></pre>
+<ul>
+<li>readAsArrayBuffer(blob) —— 将数据读取为二进制格式的 ArrayBuffer。</li>
+<li>readAsText(blob, [encoding]) —— 将数据读取为给定编码（默认为 utf-8 编码）的文本字符串。</li>
+<li>readAsDataURL(blob) —— 读取二进制数据，并将其编码为 base64 的 data url。</li>
+<li>abort() —— 取消操作。</li>
+</ul>
+<p>读取过程中，有以下事件：</p>
+<ul>
+<li>loadstart —— 开始加载。</li>
+<li>progress —— 在读取过程中出现。</li>
+<li>load —— 读取完成，没有 error。</li>
+<li>abort —— 调用了 abort()。</li>
+<li>error —— 出现 error。</li>
+<li>loadend —— 读取完成，无论成功还是失败。</li>
+</ul>
+<p>读取完成后，我们可以通过以下方式访问读取结果：</p>
+<ul>
+<li>reader.result 是结果（如果成功）</li>
+<li>reader.error 是 error（如果失败）。</li>
+</ul>
+<p>在很多情况下，我们不必读取文件内容。就像我们处理 blob 一样，我们可以使用 URL.createObjectURL(file) 创建一个短的 url，并将其赋给 a 或 img。这样，文件便可以下载文件或者将其呈现为图像，作为 canvas 等的一部分</p>

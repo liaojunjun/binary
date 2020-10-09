@@ -1,0 +1,86 @@
+<pre><code class="language-js"><span class="hljs-comment">// 分配一个16字节的连续的内存空间，并用0预填充</span>
+<span class="hljs-keyword">let</span> buffer = <span class="hljs-keyword">new</span> <span class="hljs-built_in">ArrayBuffer</span>(<span class="hljs-number">16</span>);
+alert(buffer.byteLength);</code></pre>
+<p>ArrayBuffer 与 Array 没有任何共同之处</p>
+<ul>
+<li>它的长度是固定的，无法增加或减少它的长度</li>
+<li>它正好占用那么多空间</li>
+<li>要访问单个字节，需要另一个“试图”对象，而不是 buffer[index]</li>
+</ul>
+<p><strong>要操作 ArrayBuffer，我们需要使用“视图”对象</strong></p>
+<p>视图对象并不存储任何东西，只是一副“眼睛”，透过它来解释存储 ArrayBuffer 中的字节</p>
+<ul>
+<li><p>TypedArray</p>
+<ul>
+<li>Uint8Array Uint16Array Uint32Array 用于 8 位、16 位和 32 位无符号整数</li>
+<li>Uint8ClampedArray 用于 8 位整数，在赋值时便“固定”其值</li>
+<li>Int8Array Int16Array，Int32Array —— 用于有符号整数（可以为负数）</li>
+<li>Float32Array Float64Array —— 用于 32 位和 64 位的有符号浮点数</li>
+</ul>
+</li>
+<li><p>DataView 使用方法来指定格式的视图</p>
+</li>
+</ul>
+<p><img src="https://zh.javascript.info/article/arraybuffer-binary-arrays/arraybuffer-views.svg" alt="arrayBuffer"></p>
+<h5 id="typedarray">TypedArray</h5>
+<p>视图的超类<code>TypedArray</code>，参数共有 5 种变体</p>
+<pre><code class="language-js"><span class="hljs-keyword">new</span> TypedArray(buffer, [byteOffset], [length]); <span class="hljs-comment">// 截取ArrayBuffer一部分</span>
+<span class="hljs-keyword">new</span> TypedArray(object); <span class="hljs-comment">// 参数是数组或类数组对象，则会创建一个相同长度的类型化数组，并复制内容</span>
+<span class="hljs-keyword">new</span> TypedArray(typedArray); <span class="hljs-comment">// 创建一个相同长度的类型化数组并复制内容，可能会类型转换</span>
+<span class="hljs-keyword">new</span> TypedArray(length); <span class="hljs-comment">// 创建指定长度的类型化数组，最后的字节长度是 `length * BYTES_PER_ELEMENT`</span>
+<span class="hljs-keyword">new</span> TypedArray(); <span class="hljs-comment">// 创建0长度的类型化数组</span></code></pre>
+<p>除了以一种提供 ArrayBuffer, 之外的都将自动创建 ArrayBuffer,要访问 ArrayBuffer 可以使用 <code>.buffer</code>,<code>.byteLength</code>,因此可以一个视图转另外一个视图。</p>
+<pre><code class="language-js"><span class="hljs-keyword">let</span> arr8 = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>([<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>]);
+<span class="hljs-keyword">let</span> arr16 = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint16Array</span>(arr8.buffer);</code></pre>
+<h5 id="越界行为">越界行为</h5>
+<p>256 放入 Uint8Array ,结果是 0；257 放入 Uint8Array,结果是 1.</p>
+<p><img src="https://zh.javascript.info/article/arraybuffer-binary-arrays/8bit-integer-256.svg" alt="8bit-integer-256">
+<img src="https://zh.javascript.info/article/arraybuffer-binary-arrays/8bit-integer-257.svg" alt="8bit-integer-257"></p>
+<pre><code class="language-js"><span class="hljs-keyword">let</span> arr8 = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>(<span class="hljs-number">16</span>);
+<span class="hljs-keyword">let</span> num = <span class="hljs-number">256</span>;
+<span class="hljs-built_in">console</span>.log(num.toString(<span class="hljs-number">2</span>));
+
+arr8[<span class="hljs-number">0</span>] = <span class="hljs-number">256</span>;
+arr8[<span class="hljs-number">1</span>] = <span class="hljs-number">257</span>;
+
+<span class="hljs-built_in">console</span>.log(arr8[<span class="hljs-number">0</span>]);
+<span class="hljs-built_in">console</span>.log(arr8[<span class="hljs-number">1</span>]);</code></pre>
+<h5 id="typedarray-方法">TypedArray 方法</h5>
+<ol>
+<li>遍历（iterate）</li>
+<li>map</li>
+<li>slice</li>
+<li>reduce</li>
+<li>set</li>
+<li>subarray</li>
+</ol>
+<h5 id="dataview-用于从同一-buffer-提取不同格式数字">DataView 用于从同一 buffer 提取不同格式数字</h5>
+<pre><code class="language-js"><span class="hljs-keyword">new</span> <span class="hljs-built_in">DataView</span>(buffer, [byteOffset], [byteLength]);</code></pre>
+<pre><code class="language-js"><span class="hljs-comment">// 4 个字节的二进制数组，每个都是最大值 255</span>
+<span class="hljs-keyword">let</span> buffer = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>([<span class="hljs-number">255</span>, <span class="hljs-number">255</span>, <span class="hljs-number">255</span>, <span class="hljs-number">255</span>]).buffer;
+
+<span class="hljs-keyword">let</span> dataView = <span class="hljs-keyword">new</span> <span class="hljs-built_in">DataView</span>(buffer);
+
+<span class="hljs-comment">// 在偏移量为 0 处获取 8 位数字</span>
+alert(dataView.getUint8(<span class="hljs-number">0</span>)); <span class="hljs-comment">// 255</span>
+
+<span class="hljs-comment">// 现在在偏移量为 0 处获取 16 位数字，它由 2 个字节组成，一起解析为 65535</span>
+alert(dataView.getUint16(<span class="hljs-number">0</span>)); <span class="hljs-comment">// 65535（最大的 16 位无符号整数）</span>
+
+<span class="hljs-comment">// 在偏移量为 0 处获取 32 位数字</span>
+alert(dataView.getUint32(<span class="hljs-number">0</span>)); <span class="hljs-comment">// 4294967295（最大的 32 位无符号整数）</span>
+
+dataView.setUint32(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>); <span class="hljs-comment">// 将 4 个字节的数字设为 0，即将所有字节都设为 0</span></code></pre>
+<h5 id="汇总">汇总</h5>
+<p><img src="https://zh.javascript.info/article/arraybuffer-binary-arrays/arraybuffer-view-buffersource.svg" alt="arraybuffer-view-buffersource"></p>
+<pre><code class="language-js"><span class="hljs-comment">// 将二维数组中数据转为一个Uint8Array</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">concat</span>(<span class="hljs-params">arrays</span>) </span>{
+  <span class="hljs-keyword">const</span> length = arrays.reduce(<span class="hljs-function">(<span class="hljs-params">acc, cur</span>) =&gt;</span> (acc += cur.length), <span class="hljs-number">0</span>);
+  <span class="hljs-keyword">const</span> arr8 = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>(length);
+  <span class="hljs-keyword">let</span> offset = <span class="hljs-number">0</span>;
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> array <span class="hljs-keyword">of</span> arrays) {
+    arr8.set(array, offset);
+    offset += array.length;
+  }
+  <span class="hljs-keyword">return</span> arr8;
+}</code></pre>

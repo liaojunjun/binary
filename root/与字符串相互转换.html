@@ -1,0 +1,24 @@
+<h4 id="textdecoder">TextDecoder</h4>
+<p>将字节转为字符串</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> decoder = <span class="hljs-keyword">new</span> TextDecoder();
+<span class="hljs-keyword">const</span> uint8Array = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>([
+  <span class="hljs-number">228</span>,
+  <span class="hljs-number">189</span>,
+  <span class="hljs-number">160</span>,
+  <span class="hljs-number">229</span>,
+  <span class="hljs-number">165</span>,
+  <span class="hljs-number">189</span>,
+  <span class="hljs-number">229</span>,
+  <span class="hljs-number">145</span>,
+  <span class="hljs-number">128</span>,
+]);
+
+<span class="hljs-keyword">const</span> str = decoder.decode(uint8Array);
+
+alert(str);</code></pre>
+<h4 id="textencoder">TextEncoder</h4>
+<p>将字符串转为字节</p>
+<pre><code class="language-js"><span class="hljs-keyword">const</span> encoder = <span class="hljs-keyword">new</span> TextEncoder();
+<span class="hljs-keyword">const</span> uint8Array = encoder.encode(<span class="hljs-string">&quot;你好呀&quot;</span>);
+
+alert(uint8Array);</code></pre>
